@@ -7,6 +7,12 @@ import subprocess
 import glob
 from datetime import datetime, date
 
+def _missing_arg(command):
+    return None, f"Missing argument for '{command}'"
+
+def _bad_arg(command):
+    return None, f"Invalid syntax for '{command}'"
+
 def get_commands(arg):
     return {
         "now": lambda: (datetime.now().isoformat(sep=' ', timespec='seconds'), None),
@@ -26,7 +32,6 @@ def get_commands(arg):
         "lower": lambda: (arg.lower(), None) if arg else _missing_arg("lower"),
         "reverse": lambda: (arg[::-1], None) if arg else _missing_arg("reverse"),
         "repeat": lambda: (arg.split(',', 1)[1] * int(arg.split(',', 1)[0]), None) if arg and ',' in arg else _bad_arg("repeat"),
-        "file": lambda: read_file(arg) if arg else _missing_arg("file"),
         "random": lambda: (random.choice(arg.split('|')), None) if arg else _missing_arg("random"),
     }
 
