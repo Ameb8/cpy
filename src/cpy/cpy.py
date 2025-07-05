@@ -38,8 +38,14 @@ def update_clipboard(text, append=False):
 
 def main():
     args = get_args()
-    output = get_output(" ".join(args.clip_content))
-    update_clipboard(text=output, append=args.append)
+    output, errors = get_output(" ".join(args.clip_content))
+
+    if len(errors) != 0:
+        print("INPUT ERRORS:")
+        for command, error in errors:
+            print(f"Failed Command: {command}\n\t{error}")
+    else:
+        update_clipboard(text=output, append=args.append)
     
     if args.out:
         print(output)
