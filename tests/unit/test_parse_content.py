@@ -83,6 +83,6 @@ def test_get_output_handles_multiple_commands():
 def test_get_output_handles_missing_command():
     text = "Bad: [[notarealcommand]]"
     result, errors = get_output(text)
-    # Should have error for unrecognized command
+    
     assert any("notarealcommand" in err[0] for err in errors)
     assert "[Command not recognized: notarealcommand]" not in result  # error text is not in output (replaced with empty)
