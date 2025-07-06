@@ -8,38 +8,8 @@ import glob
 from pathlib import Path
 from treelib import Tree
 from datetime import datetime, date
-
-
-def get_file_tree(path):
-    try:
-        path = Path(path).resolve(strict=True)
-
-        tree = Tree()
-        root_id = path.as_posix()
-        tree.create_node(path.name, root_id)
-
-        if path.is_dir():
-            def build_tree(current_path: Path, parent_id: str):
-                try:
-                    for item in sorted(current_path.iterdir()):
-                        item_id = item.as_posix()
-                        tree.create_node(item.name, item_id, parent=parent_id)
-                        if item.is_dir():
-                            build_tree(item, item_id)
-                except PermissionError as e:
-                    tree.create_node(f"[Permission Denied]", f"{parent_id}/__denied__", parent=parent_id)
-
-            build_tree(path, root_id)
-
-        return tree.show(stdout=False), None
-
-    except FileNotFoundError:
-        return None, f"Path '{path}' not found."
-    except PermissionError:
-        return None, f"Permission denied accessing '{path}'."
-    except Exception as e:
-        return None, f"Unexpected error: {e}"
-
+from .get_file_tree import get_file_tree
+        
 def _missing_arg(command):
     return None, f"Missing argument for '{command}'"
 
