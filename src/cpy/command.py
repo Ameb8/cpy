@@ -9,6 +9,7 @@ from pathlib import Path
 from treelib import Tree
 from datetime import datetime, date
 from .get_file_tree import get_file_tree
+from .user_vars import load_value
         
 def _missing_arg(command):
     return None, f"Missing argument for '{command}'"
@@ -40,19 +41,28 @@ def get_commands(arg):
     }
 
 def resolve_command(command_text):
-    if ':' in command_text:
+    if ':' in command_text: # Command includes arguments
         cmd, arg = map(str.strip, command_text.split(':', 1))
-    else:
+    else: # No arguments with command
         cmd, arg = command_text, None
 
-    if cmd == "env" and arg:
+    if cmd == "env" and arg: # Handle environmental variables
         if arg in os.environ:
             return os.environ[arg], None
+        
         return None, f"Environment variable '{arg}' not set"
 
-    commands = get_commands(arg)
+    if cmd == "var" and arg: # Handle user-defined variables
+        val = load_value(arg)
 
-    if cmd in commands:
+        if val: # Return variable
+            return val, None
+        
+        return None, f"User-defined variable '{arg}' not set"
+
+    commands = get_commands(arg) # Get command table
+
+    if cmd in commands: # Execute commands
         return commands[cmd]()
     
     return None, None  # Command not found
