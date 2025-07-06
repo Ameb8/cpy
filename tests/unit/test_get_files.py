@@ -4,6 +4,8 @@ from cpy.get_files import read_files, evaluate_path, INVALID_PATH_ERR
 from pathlib import Path
 
 PATCH_PATH = "cpy.get_files.Path"
+PATCH_READ_FILES = "cpy.get_files.read_files"
+PATCH_RESOLVE_COMMAND = "cpy.get_files.resolve_command"
 
 class TestReadFiles(unittest.TestCase):
 
@@ -171,7 +173,7 @@ class TestEvaluatePath(unittest.TestCase):
         self.assertIsNone(result)
         self.assertEqual(error, INVALID_PATH_ERR)
 
-    @patch(PATCH_PATH)
+    @patch(PATCH_READ_FILES)
     def test_evaluate_path_valid_file_no_delimiter(self, mock_read_files):
         mock_read_files.return_value = ({"file.txt": "hello"}, [])
 
@@ -180,8 +182,8 @@ class TestEvaluatePath(unittest.TestCase):
         self.assertEqual(result, "hello")
         self.assertIsNone(error)
 
-    @patch("cpy.get_files.resolve_command")
-    @patch(PATCH_PATH)
+    @patch(PATCH_RESOLVE_COMMAND)
+    @patch(PATCH_READ_FILES)
     def test_evaluate_path_valid_with_split(self, mock_read_files, mock_resolve_command):
         mock_read_files.return_value = ({"file.txt": "a", "file2.txt": "b"}, [])
         mock_resolve_command.return_value = ("::", None)
@@ -192,7 +194,7 @@ class TestEvaluatePath(unittest.TestCase):
         self.assertIsNone(error)
         mock_resolve_command.assert_called_with("custom_delim")
 
-    @patch(PATCH_PATH)
+    @patch(PATCH_READ_FILES)
     def test_evaluate_path_read_files_errors(self, mock_read_files):
         mock_read_files.return_value = ({}, [("file.txt", OSError("oops"))])
 
@@ -202,7 +204,7 @@ class TestEvaluatePath(unittest.TestCase):
         self.assertIn("file.txt", error)
         self.assertIn("oops", error)
 
-    @patch(PATCH_PATH)
+    @patch(PATCH_READ_FILES)
     def test_evaluate_path_no_files(self, mock_read_files):
         mock_read_files.return_value = ({}, [])
 

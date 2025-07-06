@@ -1,4 +1,5 @@
 from pathlib import Path
+from treelib import Tree
 import glob
 from .command import resolve_command
 
@@ -82,6 +83,4 @@ def evaluate_path(input):
         return None, INVALID_PATH_ERR
 
     return format_output(files, split)
-
-
 
