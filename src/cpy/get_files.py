@@ -30,15 +30,32 @@ def read_files(path_pattern, encoding = "utf-8", max_files = 1000):
     errors = {}
     file_map = {}
 
+
     try:
-        files = glob.glob(path_pattern, recursive=True)
+        #files = glob.glob(path_pattern, recursive=True)
+
+        # Set filepath as relative to working directory
+        base_path = Path().resolve()
+        absolute_pattern = str(base_path / path_pattern)
+        files = glob.glob(absolute_pattern, recursive=True)
+
+        # DEBUG *********
+        if path_pattern == "blog/views.py":
+            base_path = Path().resolve()
+            absolute_pattern = str(base_path / path_pattern)
+            print(f"File Map: {file_map}")
+            print(f"Reading from cwd: {base_path}")
+            print(f"Matched files with relative pattern: {glob.glob(path_pattern, recursive=True)}")
+            print(f"Matched files with absolute pattern: {glob.glob(absolute_pattern, recursive=True)}")
+        # END DEBUG *****
 
         count = 0
         for f in files:
             path = Path(f)
             if path.is_file():
                 try:
-                    file_map[str(path)] = path.read_text(encoding=encoding)
+                    #file_map[str(path)] = path.read_text(encoding=encoding)
+                    file_map[f] = path.read_text(encoding=encoding)
                     count += 1
                     if count >= max_files:
                         print(f"Warning: Reached max file limit ({max_files}).")
@@ -58,6 +75,11 @@ def format_output(files, delimiter_arg):
     delimiter = "\n\n" # Default separator
 
     if delimiter_arg: # Separator specified
+        if delimiter_arg.strip() == 'path': # Prepend path before files
+            return delimiter.join(f"{path}:\n\n{content}" for path, content in files.items()), None
+        if delimiter_arg.strip() == 'name': # Prepend filename before files
+            return delimiter.join(f"{path.rsplit('/', 1)[-1]}:\n\n{content}" for path, content in files.items()), None
+
         delimiter, error = resolve_command(delimiter_arg)
         
         if error: # Invalid separator

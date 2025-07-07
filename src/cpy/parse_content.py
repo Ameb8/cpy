@@ -28,9 +28,15 @@ def get_output(clip_content):
     def replacer(match):
         command = match.group(1)
         result, error = handle_input(command)
-        if error:
+
+        if error: # Handle input errors
             errors.append((command, error))
             return ""
+    
+        # Handled commands inside variables
+        if command.startswith("var:") and result:
+            return re.sub(pattern, replacer, result)
+
         return result
 
     result = re.sub(pattern, replacer, clip_content)
