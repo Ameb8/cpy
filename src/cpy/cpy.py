@@ -101,19 +101,19 @@ def handle_vars(args):
             print(f"Could not delete variable '{key}' as it has not been defined")
 
 def main():
-    args = get_args()
+    args = get_args() # Get user arguments
+    handle_vars(args) # Handle variable updates
+    output, errors = get_output(" ".join(args.clip_content)) # Get text to copy
 
-    handle_vars(args)
-    output, errors = get_output(" ".join(args.clip_content))
-
-    if len(errors) != 0:
+    if len(errors) != 0: # Text generation failed
         print("INPUT ERRORS:")
-        for command, error in errors:
+
+        for command, error in errors: # Print errors
             print(f"Failed Command: {command}\n\t{error}")
-    else:
+    else: # Success, copy text to clipboard
         update_clipboard(text=output, append=args.append)
     
-    if args.out:
+    if args.out: # Print content if requested
         print(output)
     
 

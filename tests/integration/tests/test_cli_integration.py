@@ -32,6 +32,11 @@ def test_cli_clipboard_and_output(case):
     else: # Run without file structure
         result = run_test_case(case)
 
+    # DEBUG *********
+    print(result.stdout)
+    print(result.stderr)
+    # END DEBUG *****
+
     assert result.returncode == case["returncode"]
 
     # Check stdout/stderr if defined
