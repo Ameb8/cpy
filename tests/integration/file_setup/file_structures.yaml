@@ -1,0 +1,54 @@
+django_project:
+  tree:
+    mysite:
+      __init__.py: ""
+      settings.py: ""
+      urls.py: ""
+      wsgi.py: ""
+      asgi.py: ""
+    blog:
+      __init__.py: ""
+      admin.py: ""
+      apps.py: ""
+      models.py: ""
+      tests.py: ""
+      views.py: ""
+      urls.py: ""
+      migrations:
+        __init__.py: ""
+    templates:
+      blog:
+        index.html: ""
+  files:
+    mysite/settings.py: "SECRET_KEY = 'abc123'\nINSTALLED_APPS = ['blog']"
+    blog/views.py: "from django.http import HttpResponse\ndef index(request): return HttpResponse('Hello from blog')"
+    blog/urls.py: "from django.urls import path\nfrom . import views\nurlpatterns = [path('', views.index)]"
+    mysite/urls.py: "from django.urls import path, include\nurlpatterns = [path('blog/', include('blog.urls'))]"
+    templates/blog/index.html: "<h1>Blog Home</h1>"
+
+cli_tool:
+  tree:
+    src:
+      cli:
+        __init__.py: ""
+        commands.py: ""
+      utils:
+        __init__.py: ""
+        helpers.py: ""
+  files:
+    src/cli/commands.py: "def run():\n    print('Running CLI')"
+    src/utils/helpers.py: "def help():\n    print('Help info')"
+
+flask_app:
+  tree:
+    app:
+      __init__.py: ""
+      routes.py: ""
+      models.py: ""
+      templates:
+        base.html: ""
+        index.html: ""
+  files:
+    app/routes.py: "from flask import Flask\napp = Flask(__name__)"
+    app/models.py: "# SQLAlchemy models go here"
+    app/templates/index.html: "<h1>Home Page</h1>"
