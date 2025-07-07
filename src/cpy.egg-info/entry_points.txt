@@ -1,0 +1,2 @@
+[console_scripts]
+cpy = cpy.cpy:main

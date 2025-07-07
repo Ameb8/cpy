@@ -1,0 +1,17 @@
+MANIFEST.in
+pyproject.toml
+requirements.txt
+src/copy_files/__init__.py
+src/cpy/__init__.py
+src/cpy/command.py
+src/cpy/cpy.py
+src/cpy/get_file_tree.py
+src/cpy/get_files.py
+src/cpy/parse_content.py
+src/cpy/user_vars.py
+src/cpy.egg-info/PKG-INFO
+src/cpy.egg-info/SOURCES.txt
+src/cpy.egg-info/dependency_links.txt
+src/cpy.egg-info/entry_points.txt
+src/cpy.egg-info/requires.txt
+src/cpy.egg-info/top_level.txt
