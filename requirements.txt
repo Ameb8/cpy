@@ -1,4 +1,2 @@
 pyperclip==1.9.0
-pytest==8.4.1
-PyYAML==6.0.2
 treelib==1.8.0
