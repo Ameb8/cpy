@@ -54,10 +54,10 @@ def resolve_command(command_text):
         return None, f"Environment variable '{arg}' not set"
 
     if cmd.startswith("var") and arg: # Handle user-defined variables
-        val = use_var(arg)
+        val, err = use_var(arg)
 
         if val: # Return variable
-            return val, None
+            return val, err
         
         return None, f"User-defined variable '{arg}' not set"
     

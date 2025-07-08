@@ -18,7 +18,8 @@ def handle_input(command_text):
     if result is not None or error is not None:
         return result, error
 
-    return evaluate_path(command_text)
+    result, error = evaluate_path(command_text)
+    return result, error
 
 def get_output(clip_content):
     clip_content = preprocess_content(clip_content)

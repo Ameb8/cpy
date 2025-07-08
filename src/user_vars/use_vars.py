@@ -41,7 +41,7 @@ def use_var(var_cmd):
         for param, arg in zip(params, args):
             val = val.replace(f"<<{param}>>", arg)
 
-    return val
+    return val, None
 
 
 
