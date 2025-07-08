@@ -15,8 +15,9 @@ def get_args(s):
             return None, None
 
     # Arguments passed
-    match = re.fullmatch(r'(\w+)\s*\(([\w\s,]*)\)', s)
-    if not match:
+    match = re.fullmatch(r'(\w+)\s*\((.*)\)', s)
+
+    if not match: # No args found
         return None, None
 
     name = match.group(1)

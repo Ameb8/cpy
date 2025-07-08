@@ -8,7 +8,7 @@ import glob
 from pathlib import Path
 from treelib import Tree
 from datetime import datetime, date
-from src.user_vars.manage_vars import get_var
+from src.user_vars.use_vars import use_var
 from .get_file_tree import get_file_tree
 
         
@@ -53,9 +53,8 @@ def resolve_command(command_text):
         
         return None, f"Environment variable '{arg}' not set"
 
-    if cmd == "var" and arg: # Handle user-defined variables
-        #val = load_value(arg)
-        val = get_var(arg)
+    if cmd.startswith("var") and arg: # Handle user-defined variables
+        val = use_var(arg)
 
         if val: # Return variable
             return val, None

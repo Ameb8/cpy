@@ -33,9 +33,13 @@ def use_var(var_cmd):
     if not val: # Variable not found
         return None, f"Error: variable with name '{key}' not found"
 
+    if args and params and len(params) != len(args):
+        return None, f"Error: incorrect number of arguments. Required arguments: {", ".join(params)}"
+
     # Replace params with arguments
-    for param, arg in zip(params, args):
-        val = val.replace(f"<<{param}>>", arg)
+    if params and args:
+        for param, arg in zip(params, args):
+            val = val.replace(f"<<{param}>>", arg)
 
     return val
 

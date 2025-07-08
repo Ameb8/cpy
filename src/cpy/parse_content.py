@@ -34,7 +34,7 @@ def get_output(clip_content):
             return ""
     
         # Handled commands inside variables
-        if command.startswith("var:") and result:
+        if command.startswith("var") and result:
             return re.sub(pattern, replacer, result)
 
         return result
