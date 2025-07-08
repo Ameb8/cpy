@@ -59,7 +59,7 @@ def resolve_command(command_text):
             return val, None
         
         return None, f"User-defined variable '{arg}' not set"
-
+    
     commands = get_commands(arg) # Get command table
 
     if cmd in commands: # Execute commands
