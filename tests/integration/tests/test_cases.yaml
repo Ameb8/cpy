@@ -1,4 +1,4 @@
-- name: "plain text copy"
+- name: "Plain Text Copy"
   args: ["Hello World"]
   expected_clipboard: "Hello World"
   returncode: 0
@@ -8,3 +8,10 @@
   expected_clipboard: "from django.http import HttpResponse\ndef index(request): return HttpResponse('Hello from blog')"
   returncode: 0
   file_setup: "django-project"
+
+- name: "Use Static Variables"
+  steps:
+    -args: ["--set:", "GREETING", "Hello World"]
+      return_code: 0
+    - args: ["--list"]
+      

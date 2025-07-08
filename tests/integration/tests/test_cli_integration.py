@@ -4,6 +4,7 @@ import yaml
 import pyperclip
 from pathlib import Path
 from file_setup.file_setup import setup_temp_structure
+from .dbm_setup import clean_test_db
 
 def load_test_cases():
     with open(Path(__file__).parent / "test_cases.yaml") as f:
