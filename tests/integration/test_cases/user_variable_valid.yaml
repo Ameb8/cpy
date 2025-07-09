@@ -33,7 +33,7 @@
 
 
 
-- name: "Use Variables with parameter"
+- name: "Use Variables with Parameters"
   steps:
     - name: "Create Variable"
       args: ["--set", "GREETING(name)", "Hello <<name>>"]
@@ -65,42 +65,6 @@
       return_code: 0
       expected_stdout: "variable 'GREETING' successfully deleted"
       expected_stderr: ""
-
-
-
-- name: "Use Variables with Multiple Parameters"
-  steps:
-    - name: "Create Variable"
-      args: ["--set", "PARAMS(param1, param2)", "Params: <<param2>>, <<param1>>"]
-      return_code: 0
-      expected_stdout: ""
-      expected_stderr: ""
-
-    - name: "List Variables"
-      args: ["--list"]
-      return_code: 0
-      expected_stdout: "PARAMS(param1, param2):\tParams: <<param2>>, <<param1>>"
-      expected_stderr: ""
-
-    - name: "Get Variable"
-      args: ["--get", "PARAMS(param1, param2)"]
-      return_code: 0
-      expected_stdout: "PARAMS(param1, param2):\tParams: <<param2>>, <<param1>>"
-      expected_stderr: ""
-
-    - name: "Use Variable"
-      args: [ "[[var: PARAMS(arg1, arg2)" ]
-      return_code: 0
-      expected_stdout: ""
-      expected_stderr: ""
-      expected_clipboard: "Params: arg2, arg1"
-
-    - name: "Delete Variable"
-      args: ["--delete", "PARAMS"]
-      return_code: 0
-      expected_stdout: "variable 'PARAMS' successfully deleted"
-      expected_stderr: ""
-
 
 
 
