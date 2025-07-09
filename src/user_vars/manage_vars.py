@@ -43,16 +43,18 @@ def parse_var_definition(key_str):
 def set_var(key_str, val):
     key, params = parse_var_definition(key_str) # Parse arguments
 
-    if not key: # Validate key syntax
+    if key: # Save variable
+        save_kv(key, val, params)
+    if not key: # Invalid syntax
         print(f"'{key_str}' is not a valid key. Keys must contain only letters, digits, and underscores")
 
-    save_kv(key, val, params) # Save variable
+
 
 def get_var(key):
     val, params = load_value(key)
 
     if not val:  # Key not found
-        print(f"No variable defined for Key {key}")
+        print(f"No variable defined for Key '{key}'")
     else:  # Display Key-Value pair
         print(var_str(key, val, params))
 

@@ -6,9 +6,25 @@ from pathlib import Path
 from file_setup.file_setup import setup_temp_structure
 from .dbm_setup import clean_test_db
 
+
 def load_test_cases():
-    with open(Path(__file__).parent / "test_cases.yaml") as f:
-        return yaml.safe_load(f)
+    test_classes_dir = Path(__file__).parent.parent / "test_cases"
+    all_classes = []
+
+    for file in sorted(test_classes_dir.glob("*.yaml")):
+        with open(file, "r") as f: # Load test class
+            loaded = yaml.safe_load(f)
+
+            if not loaded: # Skip empty files
+                continue
+
+            if isinstance(loaded, list): # Load list of classes
+                all_classes.extend(loaded)
+            else: # Load class
+                all_classes.append(loaded)
+
+    return all_classes
+
 
 def run_step(step, temp_dir_path=None):
     cwd = temp_dir_path if temp_dir_path else None
@@ -51,6 +67,7 @@ def run_steps(steps, temp_dir_path=None):
                 f"[{step_name}] Expected stdout:\n{step['expected_stdout']!r}\n"
                 f"Got:\n{result.stdout.strip()!r}"
             )
+
 
         # Check stderr
         if "expected_stderr" in step:

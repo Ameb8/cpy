@@ -42,7 +42,7 @@ def load_value(key):
         raw = db.get(_encode_key(key))
         if raw:
             return _decode_value(raw)
-        return None
+        return None, None
 
 def delete_kv(key):
     """

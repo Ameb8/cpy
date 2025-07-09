@@ -33,8 +33,14 @@ def use_var(var_cmd):
     if not val: # Variable not found
         return None, f"Error: variable with name '{key}' not found"
 
-    if args and params and len(params) != len(args):
+    if args and params and len(params) != len(args): # Incorrect number of args
         return None, f"Error: incorrect number of arguments. Required arguments: {", ".join(params)}"
+
+    if bool(args) != bool(params) and bool(args): # Args passed that var doesnt use
+        return None, f"Error: variable '{key}' does not take any arguments"
+
+    if bool(args) != bool(params) and bool(params): # Args passed that var doesnt use
+        return None, f"Error: variable '{key}' requires the following arguments: {", ".join(f"'{param}'" for param in params)}"
 
     # Replace params with arguments
     if params and args:

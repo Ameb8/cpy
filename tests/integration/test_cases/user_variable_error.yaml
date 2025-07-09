@@ -1,0 +1,129 @@
+- name: "Get Undefined Variable"
+  steps:
+    - name: "Attempt to Get Variable"
+      args: ["--get", "DNE"]
+      return_code: 0
+      expected_stdout: "No variable defined for Key 'DNE'"
+      expected_stderr: ""
+
+
+- name: "Use Undefined Variable"
+  steps:
+    - name: "Attempt to Use Variable"
+      args: ["[[var: DNE]]"]
+      return_code: 0
+      expected_stdout: "INPUT ERRORS:\nFailed Command: var: DNE\n\tError: variable with name 'DNE' not found"
+      expected_stderr: ""
+
+
+- name: "Delete Undefined Variable"
+  steps:
+    - name: "Attempt to Delete Variable"
+      args: ["--delete", "DNE"]
+      return_code: 0
+      expected_stdout: "Could not delete variable 'DNE' as it has not been defined"
+      expected_stderr: ""
+
+
+- name: "Name Contains Unsupported Characters"
+  steps:
+    - name: "Attempt to Create Variable"
+      args: ["--set", "INVALID NAME", "invalid"]
+      return_code: 0
+      expected_stdout: "'INVALID NAME' is not a valid key. Keys must contain only letters, digits, and underscores"
+      expected_stderr: ""
+
+    - name: "Ensure Variable not Created"
+      args: ["--list"]
+      return_code: 0
+      expected_stdout: ""
+      expected_stderr: ""
+
+
+- name: "Parameters Contain Unsupported Characters"
+  steps:
+    - name: "Attempt to Create Variable"
+      args: ["--set", "INVALID_PARAM(invalid param)"]
+      return_code: 2
+      expected_stdout: ""
+      expected_stderr: "usage: cpy [-h] [--append] [--out] [--get GET] [--set SET SET] [--list]\n           [--delete DELETE]\n           ...\ncpy: error: argument --set: expected 2 arguments"
+
+    - name: "Ensure Variable not Created"
+      args: [ "--list" ]
+      return_code: 0
+      expected_stdout: ""
+      expected_stderr: ""
+
+
+- name: "Create Without Val Param"
+  steps:
+    - name: "Attempt to Create Variable"
+      args: ["--set", "NO_VAL"]
+      return_code: 2
+      expected_stdout: ""
+      expected_stderr: "usage: cpy [-h] [--append] [--out] [--get GET] [--set SET SET] [--list]\n           [--delete DELETE]\n           ...\ncpy: error: argument --set: expected 2 arguments"
+
+    - name: "Ensure Variable not Created"
+      args: [ "--list" ]
+      return_code: 0
+      expected_stdout: ""
+      expected_stderr: ""
+
+
+- name: "Include Space After Param List"
+  steps:
+    - name: "Attempt to Create Variable"
+      args: ["--set", "INVALID(param)x"]
+      return_code: 2
+      expected_stdout: ""
+      expected_stderr: "usage: cpy [-h] [--append] [--out] [--get GET] [--set SET SET] [--list]\n           [--delete DELETE]\n           ...\ncpy: error: argument --set: expected 2 arguments"
+
+    - name: "Ensure Variable not Created"
+      args: [ "--list" ]
+      return_code: 0
+      expected_stdout: ""
+      expected_stderr: ""
+
+
+- name: "Pass too Many Arguments"
+  steps:
+    - name: "Create Variable"
+      args: ["--set", "GREET(greeting)", "<<greeting>>"]
+      return_code: 0
+      expected_stdout: ""
+      expected_stderr: ""
+
+    - name: "Attempt to Use Variable"
+      args: ["[[var: GREET(Hello, World)]]"]
+      return_code: 0
+      expected_stdout: "INPUT ERRORS:\nFailed Command: var: GREET(Hello, World)\n\tError: incorrect number of arguments. Required arguments: greeting"
+      expected_stderr: ""
+
+    - name: "Delete Variable"
+      args: ["--delete", "GREET"]
+      return_code: 0
+      expected_stdout: "variable 'GREET' successfully deleted"
+      expected_stderr: ""
+      expected_clipboard: ""
+
+- name: "Pass No Arguments When Required"
+  steps:
+    - name: "Create Variable"
+      args: ["--set", "GREET(greeting)", "<<greeting>>"]
+      return_code: 0
+      expected_stdout: ""
+      expected_stderr: ""
+
+    - name: "Attempt to Use Variable"
+      args: ["[[var: GREET]]"]
+      return_code: 0
+      #expected_stdout: ""
+      expected_stdout: "INPUT ERRORS:\nFailed Command: var: GREET\n\tError: variable 'GREET' requires the following arguments: 'greeting'"
+      expected_stderr: ""
+
+    - name: "Delete Variable"
+      args: [ "--delete",  "GREET" ]
+      return_code: 0
+      expected_stdout: "variable 'GREET' successfully deleted"
+      expected_stderr: ""
+      expected_clipboard: ""

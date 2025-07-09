@@ -58,7 +58,10 @@ def resolve_command(command_text):
 
         if val: # Return variable
             return val, err
-        
+
+        if err:
+            return None, err
+
         return None, f"User-defined variable '{arg}' not set"
     
     commands = get_commands(arg) # Get command table
