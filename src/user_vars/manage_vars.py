@@ -35,7 +35,7 @@ def parse_var_definition(key_str):
     key, params = get_args(key_str)
 
     # Validate each param (must be only alphanum or underscores)
-    if not all(re.fullmatch(r'\w+', param) for param in params):
+    if params and not all(re.fullmatch(r'\w+', param) for param in params):
         return None, None
 
     return key, params

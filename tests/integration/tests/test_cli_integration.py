@@ -9,45 +9,74 @@ from .dbm_setup import clean_test_db
 def load_test_cases():
     with open(Path(__file__).parent / "test_cases.yaml") as f:
         return yaml.safe_load(f)
-    
-def run_test_case(case, temp_dir_path = None):
+
+def run_step(step, temp_dir_path=None):
     cwd = temp_dir_path if temp_dir_path else None
-    
     return subprocess.run(
-        ["python3", "-m", "src.cpy.cpy"] + case["args"],
+        ["python3", "-m", "src.cpy.cpy"] + step["args"],
         capture_output=True,
         text=True,
         cwd=cwd
     )
 
+
 @pytest.mark.parametrize("case", load_test_cases(), ids=lambda c: c["name"])
-def test_cli_clipboard_and_output(case):
-    # Clear clipboard before test
-    pyperclip.copy("")
+def test_cli_multi_step(case):
+    pyperclip.copy("")  # Clear clipboard before each test
 
-    if "file_structure" in case: # Run test with temp file structure
+    if "file_structure" in case:
         temp_dir_ctx, temp_dir_path = setup_temp_structure(case["file_structure"])
-
         with temp_dir_ctx:
-            result = run_test_case(case, temp_dir_path)
-    else: # Run without file structure
-        result = run_test_case(case)
+            run_steps(case["steps"], temp_dir_path)
+    else:
+        run_steps(case["steps"])
 
-    # DEBUG *********
-    print(result.stdout)
-    print(result.stderr)
-    # END DEBUG *****
 
-    assert result.returncode == case["returncode"]
 
-    # Check stdout/stderr if defined
-    if "expected_stdout_contains" in case:
-        assert case["expected_stdout_contains"] in result.stdout
+def run_steps(steps, temp_dir_path=None):
+    for step in steps: # ITerate steps
+        result = run_step(step, temp_dir_path)
 
-    if "expected_stderr_contains" in case:
-        assert case["expected_stderr_contains"] in result.stderr
+        step_name = step.get("name", "<unnamed step>")
 
-    # Check clipboard contents
-    if "expected_clipboard" in case:
-        clipboard_contents = pyperclip.paste()
-        assert clipboard_contents == case["expected_clipboard"]
+        # Check return code
+        assert result.returncode == step.get("return_code", 0), (
+            f"[{step_name}] Expected return code {step.get('return_code', 0)}, "
+            f"got {result.returncode}"
+        )
+
+        # Check stdout
+        if "expected_stdout" in step:
+            assert result.stdout.strip() == step["expected_stdout"], (
+                f"[{step_name}] Expected stdout:\n{step['expected_stdout']!r}\n"
+                f"Got:\n{result.stdout.strip()!r}"
+            )
+
+        # Check stderr
+        if "expected_stderr" in step:
+            assert result.stderr.strip() == step["expected_stderr"], (
+                f"[{step_name}] Expected stderr:\n{step['expected_stderr']!r}\n"
+                f"Got:\n{result.stderr.strip()!r}"
+            )
+
+        # Check stdout contains
+        if "expected_stdout_contains" in step:
+            assert step["expected_stdout_contains"] in result.stdout, (
+                f"[{step_name}] Expected stdout to contain:\n{step['expected_stdout_contains']!r}\n"
+                f"Got:\n{result.stdout!r}"
+            )
+
+        # Check stderr contains
+        if "expected_stderr_contains" in step:
+            assert step["expected_stderr_contains"] in result.stderr, (
+                f"[{step_name}] Expected stderr to contain:\n{step['expected_stderr_contains']!r}\n"
+                f"Got:\n{result.stderr!r}"
+            )
+
+        # Check clipboard content
+        if "expected_clipboard" in step:
+            clipboard_contents = pyperclip.paste()
+            assert clipboard_contents == step["expected_clipboard"], (
+                f"[{step_name}] Expected clipboard:\n{step['expected_clipboard']!r}\n"
+                f"Got:\n{clipboard_contents!r}"
+            )
