@@ -31,5 +31,35 @@
       expected_stdout: "variable 'GREETING' successfully deleted"
       expected_stderr: ""
 
--name: "Use "
-      
+- name: "Use Variables with parameters"
+  steps:
+    - name: "Create Variable"
+      args: ["--set", "GREETING(name)", "Hello <<name>>"]
+      return_code: 0
+      expected_stdout: ""
+      expected_stderr: ""
+
+    - name: "List Variables"
+      args: ["--list"]
+      return_code: 0
+      expected_stdout: "GREETING(name):\tHello <<name>>"
+      expected_stderr: ""
+
+    - name: "Get Variable"
+      args: ["--get", "GREETING"]
+      return_code: 0
+      expected_stdout: "GREETING(name):\tHello <<name>>"
+      expected_stderr: ""
+
+    - name: "Use Variable"
+      args: [ "[[var: GREETING(Alex)]]" ]
+      return_code: 0
+      expected_stdout: ""
+      expected_stderr: ""
+      expected_clipboard: "Hello Alex"
+
+    - name: "Delete Variable"
+      args: ["--delete", "GREETING"]
+      return_code: 0
+      expected_stdout: "variable 'GREETING' successfully deleted"
+      expected_stderr: ""
