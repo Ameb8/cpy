@@ -1,4 +1,7 @@
 - name: "Use Static Variables"
+  cleanup:
+    delete_var:
+      - "GREETING"
   steps:
     - name: "Create Variable"
       args: ["--set", "GREETING", "Hello World"]
@@ -33,6 +36,9 @@
 
 
 - name: "Use Variables with parameter"
+  cleanup:
+    delete_var:
+      - "GREETING"
   steps:
     - name: "Create Variable"
       args: ["--set", "GREETING(name)", "Hello <<name>>"]
@@ -67,6 +73,9 @@
 
 
 - name: "Use Variables with Multiple Parameters"
+  cleanup:
+    delete_var:
+      - "PARAMS"
   steps:
     - name: "Create Variable"
       args: ["--set", "PARAMS(param1, param2)", "Params: <<param2>>, <<param1>>"]
@@ -101,6 +110,9 @@
 
 
 - name: "Use Dynamic Variables"
+  cleanup:
+    delete_var:
+      - "LOWERCASE"
   steps:
     - name: "Create Dynamic Variable"
       args: ["--set", "LOWERCASE", "Some lowercase text: [[lower: LOWER]]"]
@@ -135,6 +147,9 @@
 
 
 - name: "Use Commands in Parameter"
+  cleanup:
+    delete_var:
+      - "PASS_COMMAND"
   steps:
     - name: "Create Dynamic Variable"
       args: ["--set", "PASS_COMMAND(cmd)", "Command: [[<<cmd>>]]"]
@@ -169,6 +184,9 @@
 
 
 - name: "Override Variable"
+  cleanup:
+    delete_var:
+      - "VAR"
   steps:
     - name: "Create Original Variable"
       args: ["--set", "VAR(txt)", "<<txt>>"]

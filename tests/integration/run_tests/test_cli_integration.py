@@ -5,6 +5,7 @@ import pyperclip
 from pathlib import Path
 from file_setup.file_setup import setup_temp_structure
 from .dbm_setup import clean_test_db
+from .cleanup import run_cleanup
 
 
 def load_test_cases():
@@ -36,6 +37,13 @@ def run_step(step, temp_dir_path=None):
     )
 
 
+def run_test_case(case, temp_dir_path=None):
+    try:
+        run_steps(case["steps"], temp_dir_path)
+    finally:
+        run_cleanup(case.get("cleanup"))
+
+
 @pytest.mark.parametrize("case", load_test_cases(), ids=lambda c: c["name"])
 def test_cli_multi_step(case):
     pyperclip.copy("")  # Clear clipboard before each test
@@ -43,11 +51,9 @@ def test_cli_multi_step(case):
     if "file_structure" in case:
         temp_dir_ctx, temp_dir_path = setup_temp_structure(case["file_structure"])
         with temp_dir_ctx:
-            run_steps(case["steps"], temp_dir_path)
+            run_test_case(case, temp_dir_ctx)
     else:
-        run_steps(case["steps"])
-
-
+        run_test_case(case)
 
 def run_steps(steps, temp_dir_path=None):
     for step in steps: # ITerate steps

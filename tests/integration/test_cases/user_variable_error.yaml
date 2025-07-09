@@ -86,6 +86,9 @@
 
 
 - name: "Pass too Many Arguments"
+  cleanup:
+    delete_var:
+      - "GREET"
   steps:
     - name: "Create Variable"
       args: ["--set", "GREET(greeting)", "<<greeting>>"]
@@ -107,6 +110,9 @@
       expected_clipboard: ""
 
 - name: "Pass No Arguments When Required"
+  cleanup:
+    delete_var:
+      - "GREET"
   steps:
     - name: "Create Variable"
       args: ["--set", "GREET(greeting)", "<<greeting>>"]
@@ -117,13 +123,5 @@
     - name: "Attempt to Use Variable"
       args: ["[[var: GREET]]"]
       return_code: 0
-      #expected_stdout: ""
       expected_stdout: "INPUT ERRORS:\nFailed Command: var: GREET\n\tError: variable 'GREET' requires the following arguments: 'greeting'"
       expected_stderr: ""
-
-    - name: "Delete Variable"
-      args: [ "--delete",  "GREET" ]
-      return_code: 0
-      expected_stdout: "variable 'GREET' successfully deleted"
-      expected_stderr: ""
-      expected_clipboard: ""
