@@ -18,7 +18,8 @@ def handle_input(command_text):
     if result is not None or error is not None:
         return result, error
 
-    return evaluate_path(command_text)
+    result, error = evaluate_path(command_text)
+    return result, error
 
 def get_output(clip_content):
     clip_content = preprocess_content(clip_content)
@@ -34,7 +35,7 @@ def get_output(clip_content):
             return ""
     
         # Handled commands inside variables
-        if command.startswith("var:") and result:
+        if command.startswith("var") and result:
             return re.sub(pattern, replacer, result)
 
         return result

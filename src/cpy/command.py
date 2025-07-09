@@ -8,8 +8,9 @@ import glob
 from pathlib import Path
 from treelib import Tree
 from datetime import datetime, date
+from src.user_vars.use_vars import use_var
 from .get_file_tree import get_file_tree
-from .user_vars import load_value
+
         
 def _missing_arg(command):
     return None, f"Missing argument for '{command}'"
@@ -52,14 +53,14 @@ def resolve_command(command_text):
         
         return None, f"Environment variable '{arg}' not set"
 
-    if cmd == "var" and arg: # Handle user-defined variables
-        val = load_value(arg)
+    if cmd.startswith("var") and arg: # Handle user-defined variables
+        val, err = use_var(arg)
 
         if val: # Return variable
-            return val, None
+            return val, err
         
         return None, f"User-defined variable '{arg}' not set"
-
+    
     commands = get_commands(arg) # Get command table
 
     if cmd in commands: # Execute commands
