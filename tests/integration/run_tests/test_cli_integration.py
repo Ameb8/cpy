@@ -1,8 +1,10 @@
 import subprocess
+import os
 import pytest
 import yaml
 import pyperclip
 from pathlib import Path
+from ..file_setup.file_setup import setup_temp_structure
 from .dbm_setup import clean_test_db
 from .setup import run_setup
 from .cleanup import run_cleanup
@@ -26,7 +28,7 @@ def load_test_cases():
 
     return all_classes
 
-
+'''
 def run_step(step, temp_dir_path=None):
     cwd = temp_dir_path if temp_dir_path else None
     return subprocess.run(
@@ -35,11 +37,27 @@ def run_step(step, temp_dir_path=None):
         text=True,
         cwd=cwd
     )
+'''
 
+
+def run_step(step, temp_dir_path=None):
+    cwd = temp_dir_path if temp_dir_path else None
+    project_root = str(Path(__file__).parent.parent.parent)  # Adjust based on your structure
+
+    return subprocess.run(
+        ["python3", "-m", "src.cpy.cpy"] + step["args"],
+        capture_output=True,
+        text=True,
+        cwd=cwd,
+        env={
+            **os.environ,
+            "PYTHONPATH": project_root  # Add project root to Python path
+        }
+    )
 
 def run_test_case(case, temp_dir_path=None):
     try:
-        #run_setup(case.get("setup"))
+        run_setup(case.get("setup"))
         run_steps(case["steps"], temp_dir_path)
     finally:
         run_cleanup(case.get("cleanup"))
@@ -52,13 +70,13 @@ def test_cli_multi_step(case):
     if "file_structure" in case:
         temp_dir_ctx, temp_dir_path = setup_temp_structure(case["file_structure"])
         with temp_dir_ctx:
-            run_test_case(case, temp_dir_ctx)
+            run_test_case(case, temp_dir_path)
     else:
         run_test_case(case)
 
 
 def run_steps(steps, temp_dir_path=None):
-    for step in steps: # ITerate steps
+    for step in steps: # Iterate steps
         result = run_step(step, temp_dir_path)
 
         step_name = step.get("name", "<unnamed step>")

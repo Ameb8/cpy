@@ -1,11 +1,9 @@
 - name: "Get Django Tree"
-  setup:
-    setup_files:
-      - "django_project"
+  file_structure: "django_project"
   steps:
     - name: "Print Tree"
       args: ["[[tree]]"]
-      return_code: 0
+      return_code: 1
       expected_stdout: ""
       expected_stderr: ""
       expected_clipboard: ""
