@@ -3,8 +3,8 @@ import pytest
 import yaml
 import pyperclip
 from pathlib import Path
-from file_setup.file_setup import setup_temp_structure
 from .dbm_setup import clean_test_db
+from .setup import run_setup
 from .cleanup import run_cleanup
 
 
@@ -39,6 +39,7 @@ def run_step(step, temp_dir_path=None):
 
 def run_test_case(case, temp_dir_path=None):
     try:
+        #run_setup(case.get("setup"))
         run_steps(case["steps"], temp_dir_path)
     finally:
         run_cleanup(case.get("cleanup"))
@@ -54,6 +55,7 @@ def test_cli_multi_step(case):
             run_test_case(case, temp_dir_ctx)
     else:
         run_test_case(case)
+
 
 def run_steps(steps, temp_dir_path=None):
     for step in steps: # ITerate steps
@@ -73,7 +75,6 @@ def run_steps(steps, temp_dir_path=None):
                 f"[{step_name}] Expected stdout:\n{step['expected_stdout']!r}\n"
                 f"Got:\n{result.stdout.strip()!r}"
             )
-
 
         # Check stderr
         if "expected_stderr" in step:
