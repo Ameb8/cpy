@@ -60,6 +60,7 @@ def update_clipboard(text, append=False):
 
     pyperclip.copy(text)
 
+
 def is_valid_key(key):
     return all(c.isalnum() or c == '_' for c in key)
 
