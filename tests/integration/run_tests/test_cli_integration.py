@@ -3,6 +3,8 @@ import os
 import pytest
 import yaml
 import pyperclip
+import tempfile
+import shutil
 from pathlib import Path
 from ..file_setup.file_setup import setup_temp_structure
 from .dbm_setup import clean_test_db
@@ -28,21 +30,18 @@ def load_test_cases():
 
     return all_classes
 
-'''
-def run_step(step, temp_dir_path=None):
-    cwd = temp_dir_path if temp_dir_path else None
-    return subprocess.run(
-        ["python3", "-m", "src.cpy.cpy"] + step["args"],
-        capture_output=True,
-        text=True,
-        cwd=cwd
-    )
-'''
-
 
 def run_step(step, temp_dir_path=None):
     cwd = temp_dir_path if temp_dir_path else None
-    project_root = str(Path(__file__).parent.parent.parent)  # Adjust based on your structure
+
+    # This should point to your actual project root — the parent of "src"
+    project_root = str(Path(__file__).resolve().parent.parent.parent.parent)
+
+    # DEBUG *******
+    #print(f"Project Root: {project_root}")
+    # END DEBUG ***
+
+    pythonpath = f"{project_root}:{os.environ.get('PYTHONPATH', '')}"
 
     return subprocess.run(
         ["python3", "-m", "src.cpy.cpy"] + step["args"],
@@ -51,28 +50,24 @@ def run_step(step, temp_dir_path=None):
         cwd=cwd,
         env={
             **os.environ,
-            "PYTHONPATH": project_root  # Add project root to Python path
+            "PYTHONPATH": pythonpath
         }
     )
-
-def run_test_case(case, temp_dir_path=None):
-    try:
-        run_setup(case.get("setup"))
-        run_steps(case["steps"], temp_dir_path)
-    finally:
-        run_cleanup(case.get("cleanup"))
 
 
 @pytest.mark.parametrize("case", load_test_cases(), ids=lambda c: c["name"])
 def test_cli_multi_step(case):
     pyperclip.copy("")  # Clear clipboard before each test
 
-    if "file_structure" in case:
-        temp_dir_ctx, temp_dir_path = setup_temp_structure(case["file_structure"])
-        with temp_dir_ctx:
-            run_test_case(case, temp_dir_path)
-    else:
-        run_test_case(case)
+    temp_dir_path = None
+    if case.get("run_in_tmp"):
+        temp_dir_path = tempfile.mkdtemp(prefix="testcase-")
+
+    try:
+        run_setup(case.get("setup"), temp_dir_path)
+        run_steps(case["steps"], temp_dir_path)
+    finally:
+        run_cleanup(case.get("cleanup"))
 
 
 def run_steps(steps, temp_dir_path=None):

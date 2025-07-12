@@ -1,18 +1,12 @@
 - name: "Get Django Tree"
-  file_structure: "django_project"
+  setup:
+    setup_files:
+      "django_project"
+  run_in_tmp: true
   steps:
     - name: "Print Tree"
-      args: ["[[tree]]"]
-      return_code: 1
-      expected_stdout: ""
-      expected_stderr: ""
-      expected_clipboard: ""
-
-- name: "Get Base Tree"
-  steps:
-    - name: "Print Tree"
-      args: ["[[tree]]"]
+      args: ["--out", "[[tree]]"]
       return_code: 0
-      expected_stdout: ""
+      expected_stdout_contains: "\n└── django_project\n    ├── blog\n    │   ├── __init__.py\n    │   ├── admin.py\n    │   ├── apps.py\n    │   ├── migrations\n    │   │   └── __init__.py\n    │   ├── models.py\n    │   ├── tests.py\n    │   ├── urls.py\n    │   └── views.py\n    ├── mysite\n    │   ├── __init__.py\n    │   ├── asgi.py\n    │   ├── settings.py\n    │   ├── urls.py\n    │   └── wsgi.py\n    └── templates\n        └── blog\n            └── index.html\n\n"
       expected_stderr: ""
-      expected_clipboard: ""
+
