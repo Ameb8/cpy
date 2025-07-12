@@ -7,6 +7,155 @@
     - name: "Print Tree"
       args: ["--out", "[[tree]]"]
       return_code: 0
-      expected_stdout_contains: "\n└── django_project\n    ├── blog\n    │   ├── __init__.py\n    │   ├── admin.py\n    │   ├── apps.py\n    │   ├── migrations\n    │   │   └── __init__.py\n    │   ├── models.py\n    │   ├── tests.py\n    │   ├── urls.py\n    │   └── views.py\n    ├── mysite\n    │   ├── __init__.py\n    │   ├── asgi.py\n    │   ├── settings.py\n    │   ├── urls.py\n    │   └── wsgi.py\n    └── templates\n        └── blog\n            └── index.html\n\n"
+      expected_stdout_contains:
+        - "\n└── django_project\n    ├── blog\n    │   ├── __init__.py\n    │   ├── admin.py\n    │   ├── apps.py\n    │   ├── migrations\n    │   │   └── __init__.py\n    │   ├── models.py\n    │   ├── tests.py\n    │   ├── urls.py\n    │   └── views.py\n    ├── mysite\n    │   ├── __init__.py\n    │   ├── asgi.py\n    │   ├── settings.py\n    │   ├── urls.py\n    │   └── wsgi.py\n    └── templates\n        └── blog\n            └── index.html\n\n"
       expected_stderr: ""
+
+
+- name: "Get Single File in Nested Subdirectory"
+  setup:
+    setup_files:
+      "cli_tool"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: ["--out", "[[cli_tool/src/cli/commands.py]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "def run():\n    print('Running CLI')"
+      expected_stderr: ""
+
+
+- name: "Get Single File in Nested Subdirectory With Name"
+  setup:
+    setup_files:
+      "cli_tool"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: ["--out", "[[cli_tool/src/cli/commands.py --split: name]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "commands.py:\n\ndef run():\n    print('Running CLI')"
+      expected_stderr: ""
+
+
+- name: "Get Single File in Nested Subdirectory With Path"
+  setup:
+    setup_files:
+      "cli_tool"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: ["--out", "[[cli_tool/src/cli/commands.py --split: path]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "cli_tool/src/cli/commands.py:\n\ndef run():\n    print('Running CLI')"
+      expected_stderr: ""
+
+
+- name: "Get All Python Files"
+  setup:
+    setup_files:
+      "django_project"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: ["--out", "[[**/*.py]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "SECRET_KEY = 'abc123'\nINSTALLED_APPS = ['blog']"
+        - "from django.urls import path, include\nurlpatterns = [path('blog/', include('blog.urls'))]"
+        - "from django.urls import path\nfrom . import views\nurlpatterns = [path('', views.index)]"
+        - "from django.http import HttpResponse\ndef index(request): return HttpResponse('Hello from blog')"
+      expected_stderr: ""
+
+
+- name: "Get All Python Files With Name"
+  setup:
+    setup_files:
+      "django_project"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: ["--out", "[[**/*.py --split: name]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "settings.py:\n\nSECRET_KEY = 'abc123'\nINSTALLED_APPS = ['blog']"
+        - "urls.py:\n\nfrom django.urls import path, include\nurlpatterns = [path('blog/', include('blog.urls'))]"
+        - "urls.py:\n\nfrom django.urls import path\nfrom . import views\nurlpatterns = [path('', views.index)]"
+        - "views.py:\n\nfrom django.http import HttpResponse\ndef index(request): return HttpResponse('Hello from blog')"
+      expected_stderr: ""
+
+
+- name: "Get All Python Files With Path"
+  setup:
+    setup_files:
+      "django_project"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: ["--out", "[[**/*.py --split: path]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "mysite/settings.py:\n\nSECRET_KEY = 'abc123'\nINSTALLED_APPS = ['blog']"
+        - "mysite/urls.py:\n\nfrom django.urls import path, include\nurlpatterns = [path('blog/', include('blog.urls'))]"
+        - "blog/urls.py:\n\nfrom django.urls import path\nfrom . import views\nurlpatterns = [path('', views.index)]"
+        - "blog/views.py:\n\nfrom django.http import HttpResponse\ndef index(request): return HttpResponse('Hello from blog')"
+      expected_stderr: ""
+
+- name: "Get All Files With Path"
+  setup:
+    setup_files:
+      "django_project"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: ["--out", "[[**/*.* --split: path]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "mysite/settings.py:\n\nSECRET_KEY = 'abc123'\nINSTALLED_APPS = ['blog']"
+        - "mysite/urls.py:\n\nfrom django.urls import path, include\nurlpatterns = [path('blog/', include('blog.urls'))]"
+        - "blog/urls.py:\n\nfrom django.urls import path\nfrom . import views\nurlpatterns = [path('', views.index)]"
+        - "blog/views.py:\n\nfrom django.http import HttpResponse\ndef index(request): return HttpResponse('Hello from blog')"
+        - "templates/blog/index.html:\n\n<h1>Blog Home</h1>"
+      expected_stderr: ""
+
+
+- name: "Split Multiple Files With Text"
+  setup:
+    setup_files:
+      "django_project"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: [ "--out", "[[**/*.* --split: Test Delimiter]]" ]
+      return_code: 0
+      expected_stdout_contains:
+        - "Test Delimiter\n\nSECRET_KEY = 'abc123'\nINSTALLED_APPS = ['blog']"
+        - "Test Delimiter\n\nfrom django.urls import path, include\nurlpatterns = [path('blog/', include('blog.urls'))]"
+        - "Test Delimiter\n\nfrom django.urls import path\nfrom . import views\nurlpatterns = [path('', views.index)]"
+        - "Test Delimiter\n\nfrom django.http import HttpResponse\ndef index(request): return HttpResponse('Hello from blog')"
+        - "Test Delimiter\n\n<h1>Blog Home</h1>"
+      expected_stderr: ""
+
+
+- name: "Split Multiple Files With Command"
+  setup:
+    setup_files:
+      "django_project"
+  run_in_tmp: true
+  steps:
+    - name: "Get File Contents"
+      args: [ "--out", "[[**/*.* --split: lower:LOWERCASE_DELIM]]" ]
+      return_code: 0
+      expected_stdout_contains:
+        - "lowercase_delim\n\nSECRET_KEY = 'abc123'\nINSTALLED_APPS = ['blog']"
+        - "lowercase_delim\n\nfrom django.urls import path, include\nurlpatterns = [path('blog/', include('blog.urls'))]"
+        - "lowercase_delim\n\nfrom django.urls import path\nfrom . import views\nurlpatterns = [path('', views.index)]"
+        - "lowercase_delim\n\nfrom django.http import HttpResponse\ndef index(request): return HttpResponse('Hello from blog')"
+        - "lowercase_delim\n\n<h1>Blog Home</h1>"
+      expected_stderr: ""
+
+
 

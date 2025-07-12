@@ -85,7 +85,7 @@ def format_output(files, delimiter_arg):
         if error: # Invalid separator
             return None, error
 
-    return delimiter.join(files.values()), None
+    return f"{delimiter}\n\n".join(files.values()), None
     
 def evaluate_path(input):
     # Parse filepath and separator

@@ -58,12 +58,10 @@ def run_setup(setup_block, temp_dir_path=None):
 
         func = SETUP_FUNCTIONS[action]
 
-        # DEBUG *******
-        print(f"Action: {action}\tArgs: {args}")
-        # END DEBUG ***
-
         # Normalize to list if single instance
         if not isinstance(args, list):
             args = [args]
 
         func(*args, base_dir=temp_dir_path)
+
+

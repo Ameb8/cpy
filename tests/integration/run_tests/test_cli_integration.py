@@ -5,12 +5,17 @@ import yaml
 import pyperclip
 import tempfile
 import shutil
+import logging
 from pathlib import Path
 from ..file_setup.file_setup import setup_temp_structure
 from .dbm_setup import clean_test_db
 from .setup import run_setup
 from .cleanup import run_cleanup
 
+logger = logging.getLogger(__name__)
+
+def print_bold(text):
+    return f"\033[1m{text}\033[0m"
 
 def load_test_cases():
     test_classes_dir = Path(__file__).parent.parent / "test_cases"
@@ -34,12 +39,8 @@ def load_test_cases():
 def run_step(step, temp_dir_path=None):
     cwd = temp_dir_path if temp_dir_path else None
 
-    # This should point to your actual project root — the parent of "src"
+    # Path to project root
     project_root = str(Path(__file__).resolve().parent.parent.parent.parent)
-
-    # DEBUG *******
-    #print(f"Project Root: {project_root}")
-    # END DEBUG ***
 
     pythonpath = f"{project_root}:{os.environ.get('PYTHONPATH', '')}"
 
@@ -53,6 +54,7 @@ def run_step(step, temp_dir_path=None):
             "PYTHONPATH": pythonpath
         }
     )
+
 
 
 @pytest.mark.parametrize("case", load_test_cases(), ids=lambda c: c["name"])
@@ -76,6 +78,11 @@ def run_steps(steps, temp_dir_path=None):
 
         step_name = step.get("name", "<unnamed step>")
 
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"\n{print_bold(step_name + ":")}")
+            logger.debug(f"\n{print_bold("stdout:")}\n\n{result.stdout}")
+            logger.debug(f"\n{print_bold("stderr:")}\n\n{result.stderr}")
+
         # Check return code
         assert result.returncode == step.get("return_code", 0), (
             f"[{step_name}] Expected return code {step.get('return_code', 0)}, "
@@ -98,10 +105,11 @@ def run_steps(steps, temp_dir_path=None):
 
         # Check stdout contains
         if "expected_stdout_contains" in step:
-            assert step["expected_stdout_contains"] in result.stdout, (
-                f"[{step_name}] Expected stdout to contain:\n{step['expected_stdout_contains']!r}\n"
-                f"Got:\n{result.stdout!r}"
-            )
+            for item in step["expected_stdout_contains"]:
+                assert item in result.stdout, (
+                    f"[{step_name}] Expected stdout to contain:\n{item!r}\n"
+                    f"Got:\n{result.stdout!r}"
+                )
 
         # Check stderr contains
         if "expected_stderr_contains" in step:
