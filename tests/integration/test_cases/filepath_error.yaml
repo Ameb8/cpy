@@ -1,0 +1,56 @@
+- name: "Error in filepath"
+  setup:
+    setup_files:
+      "flask_app"
+  run_in_tmp: true
+  steps:
+    - name: "Attempt Get File Contents"
+      args: ["[[app/templates/index.htmx]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "Warning: No files matched or could be read."
+        - "INPUT ERRORS:"
+        - "app/templates/index.htmx"
+        - "\tCommand not recognized"
+      expected_stderr: ""
+      expected_clipboard: ""
+
+
+- name: "Path to Non-Existent Directory"
+  setup:
+    setup_files:
+      "django_project"
+  run_in_tmp: true
+  steps:
+    - name: "Attempt to get directory contents"
+      args: ["[[blogs/__pycache__]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "Warning: No files matched or could be read."
+        - "INPUT ERRORS:"
+        - "Failed Command: blogs/__pycache__"
+        - "\tCommand not recognized"
+      expected_stderr: ""
+      expected_clipboard: ""
+
+
+- name: "Query Filetree from Non-Existent Directory"
+  setup:
+    setup_files:
+      "cli_tool"
+  run_in_tmp: true
+  steps:
+    - name: "Attempt to get File Tree"
+      args: ["[[tree: mysite/pycache]]"]
+      return_code: 0
+      expected_stdout_contains:
+        - "INPUT ERRORS:"
+        - "Failed Command: tree: mysite/pycache"
+        - "\tPath 'mysite/pycache' not found."
+      expected_stderr: ""
+      expected_clipboard: ""
+
+
+
+
+
