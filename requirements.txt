@@ -1,2 +1,26 @@
+build==1.2.2.post1
+certifi==2025.6.15
+charset-normalizer==3.4.2
+coverage==7.9.2
+-e git+https://github.com/Ameb8/cpy.git@fd43d9408fd57411251e5a1061dbde55af525f7d#egg=cpy
+docopt==0.6.2
+idna==3.10
+iniconfig==2.1.0
+Jinja2==3.1.6
+MarkupSafe==3.0.2
+packaging==25.0
+pipreqs==0.4.13
+pluggy==1.6.0
+Pygments==2.19.2
 pyperclip==1.9.0
+pyproject_hooks==1.2.0
+pytest==8.4.1
+pytest-cov==6.2.1
+pytest-html==4.1.1
+pytest-metadata==3.1.1
+PyYAML==6.0.2
+requests==2.32.4
+six==1.17.0
 treelib==1.8.0
+urllib3==2.5.0
+yarg==0.1.10

@@ -52,3 +52,4 @@ flask_app:
     app/routes.py: "from flask import Flask\napp = Flask(__name__)"
     app/models.py: "# SQLAlchemy models go here"
     app/templates/index.html: "<h1>Home Page</h1>"
+
