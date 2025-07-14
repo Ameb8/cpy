@@ -21,3 +21,9 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --upgrade pip \
  && pip install -r requirements.txt
+
+
+COPY bin/cpy /usr/local/bin/cpy
+RUN chmod +x /usr/local/bin/cpy
+
+
