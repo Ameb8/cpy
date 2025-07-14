@@ -21,6 +21,8 @@ def handle_var_args(cl_args):
     if cl_args.list:
         list_vars()
 
+def quote_str(str):
+    return f"'{str}'"
 
 def use_var(var_cmd):
     key, args = get_args(var_cmd) # Extract variable name and args
@@ -40,7 +42,7 @@ def use_var(var_cmd):
         return None, f"Error: variable '{key}' does not take any arguments"
 
     if bool(args) != bool(params) and bool(params): # Args passed that var doesnt use
-        return None, f"Error: variable '{key}' requires the following arguments: {', '.join('\'' + param + '\''  for param in params)}"
+        return None, f"Error: variable '{key}' requires the following arguments: { ', '.join(quote_str(param) for param in params)}"
 
     # Replace params with arguments
     if params and args:

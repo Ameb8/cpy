@@ -2,7 +2,7 @@ import re
 from .repository import save_kv, load_value, list_kvs, delete_kv
 
 def var_str(key, val, params=None):
-    return f"{key}({", ".join(params)}):\t{val}"
+    return f"{key}({', '.join(params)}):\t{val}"
 
 def get_args(s):
     s = s.strip()
@@ -47,7 +47,6 @@ def set_var(key_str, val):
         save_kv(key, val, params)
     if not key: # Invalid syntax
         print(f"'{key_str}' is not a valid key. Keys must contain only letters, digits, and underscores")
-
 
 
 def get_var(key):
