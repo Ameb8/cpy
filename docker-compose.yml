@@ -1,14 +1,35 @@
-version: '3.8'
-
 services:
-  cpy:
+  cpy: # Development mode
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - .:/app:delegated
+    environment:
+      - CPY_DP_PATH=/app/.user_vars.db
+      - PYTHONPATH=/app/src
     working_dir: /app
     tty: true
     stdin_open: true
     command: bash
 
+  test: # Run test suite
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app:delegated
+      - /tmp:/tmp
+    environment:
+      - CPY_DP_PATH=/app/.user_vars.db
+      - PYTHONPATH=/app/src
+    working_dir: /app
+    command: >
+      /bin/bash -c "
+        echo 'Starting Xvfb...' &&
+        Xvfb :99 -screen 0 1024x768x24 &
+
+        export DISPLAY=:99 &&
+        echo 'Running tests...' &&
+        pytest --capture=no -vv
+      "

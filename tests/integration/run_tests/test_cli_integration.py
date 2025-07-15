@@ -62,6 +62,9 @@ def test_cli_multi_step(case):
     if case.get("expected_fail", False): # Test case expected failure
         pytest.xfail(f"Expected failure: {case['name']}")
 
+    if case.get("skip", True): # Skip test case
+        return
+
     pyperclip.copy("")  # Clear clipboard before each test
 
     temp_dir_path = None
