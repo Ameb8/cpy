@@ -22,8 +22,10 @@ COPY requirements.txt .
 RUN pip install --upgrade pip \
  && pip install -r requirements.txt
 
-
+# Run script program 'cpy' cmd and clipboard args
 COPY bin/cpy /usr/local/bin/cpy
 RUN chmod +x /usr/local/bin/cpy
 
-
+# Run tests with clipboard functionality
+#COPY bin/pytest /usr/local/bin/pytest
+#RUN chmod +x /usr/local/bin/pytest

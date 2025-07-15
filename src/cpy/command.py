@@ -8,7 +8,7 @@ import glob
 from pathlib import Path
 from treelib import Tree
 from datetime import datetime, date
-from src.user_vars.use_vars import use_var
+from user_vars.use_vars import use_var
 from .get_file_tree import get_file_tree
 
         

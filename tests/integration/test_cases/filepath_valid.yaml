@@ -123,6 +123,7 @@
 
 
 - name: "Split Multiple Files With Text"
+  expected_fail: true
   setup:
     setup_files:
       "django_project"

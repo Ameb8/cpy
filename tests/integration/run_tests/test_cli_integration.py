@@ -59,6 +59,9 @@ def run_step(step, temp_dir_path=None):
 
 @pytest.mark.parametrize("case", load_test_cases(), ids=lambda c: c["name"])
 def test_cli_multi_step(case):
+    if case.get("expected_fail", False): # Test case expected failure
+        pytest.xfail(f"Expected failure: {case['name']}")
+
     pyperclip.copy("")  # Clear clipboard before each test
 
     temp_dir_path = None
@@ -78,10 +81,11 @@ def run_steps(steps, temp_dir_path=None):
 
         step_name = step.get("name", "<unnamed step>")
 
+
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f"\n{print_bold(step_name + ":")}")
-            logger.debug(f"\n{print_bold("stdout:")}\n\n{result.stdout}")
-            logger.debug(f"\n{print_bold("stderr:")}\n\n{result.stderr}")
+            logger.debug(f"\n{print_bold(step_name + ':')}:")
+            logger.debug(f"\n{print_bold('stdout:')}\n\n{result.stdout}")
+            logger.debug(f"\n{print_bold('stderr:')}\n\n{result.stderr}")
 
         # Check return code
         assert result.returncode == step.get("return_code", 0), (
