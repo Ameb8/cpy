@@ -119,7 +119,7 @@ jobs:
 
           if git diff --quiet; then
             echo "No changes to commit"
-          else
+          else # Update formula
             git add cpy.rb
             git commit -m "Update cpy to version ${VERSION}"
             git push origin main
