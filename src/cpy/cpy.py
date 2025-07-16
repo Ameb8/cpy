@@ -1,7 +1,7 @@
 import argparse
 import pyperclip
 from .parse_content import get_output
-from src.user_vars.use_vars import handle_var_args
+from user_vars.use_vars import handle_var_args
 
 CPY_DESCRIPTION = "cpy is a command line tool for copying formatted text to your clipboard"
 
