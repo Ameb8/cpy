@@ -61,6 +61,8 @@ jobs:
 
       - name: Upload Source Distribution (tar.gz)
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/cpy-${{ steps.get_version.outputs.version }}.tar.gz
@@ -69,6 +71,8 @@ jobs:
 
       - name: Upload Wheel Distribution (.whl)
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/cpy-${{ steps.get_version.outputs.version }}-py3-none-any.whl
