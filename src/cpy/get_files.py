@@ -2,6 +2,10 @@ from pathlib import Path
 from treelib import Tree
 import glob
 from .command import resolve_command
+from cmd_parser import Cmd
+
+
+
 
 INVALID_PATH_ERR = "Command not recognized:"
 
@@ -88,9 +92,12 @@ def format_output(files, delimiter_arg):
 
     return f"{delimiter}\n\n".join(files.values()), None
     
-def evaluate_path(input):
+def evaluate_path(input: str):
+    cmd: Cmd = Cmd.get_cmd(input)
+
+
     # Parse filepath and separator
-    path, split = get_delimiter(input)
+    #path, split = get_delimiter(input)
 
     if not path: # Invalid path
         return None, INVALID_PATH_ERR
