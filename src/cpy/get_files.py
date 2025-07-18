@@ -61,7 +61,8 @@ def read_files(path_pattern, encoding = "utf-8", max_files = 1000):
                         print(f"Warning: Reached max file limit ({max_files}).")
                         break
                 except (UnicodeDecodeError, PermissionError, OSError) as e:
-                    errors[str(path)] = e
+                    # errors[str(path)] = e
+                    continue
 
         if not file_map and not errors:
             print("Warning: No files matched or could be read.")
