@@ -9,6 +9,7 @@ func applyVar(input string) (string, error) {
 	result := ""
 
 	command, err := ParseCommand(input)
+	command = command
 
 	if err != nil {
 		return "", errors.New("Command could not be parsed")
