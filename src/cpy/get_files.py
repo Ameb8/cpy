@@ -2,7 +2,7 @@ from pathlib import Path
 from treelib import Tree
 import glob
 from .command import resolve_command
-from cmd_parser import Cmd
+from .cmd_parser import Cmd
 
 
 
@@ -89,7 +89,8 @@ def format_output(cmd: Cmd, files: dict[str, str]):
             if "name" in cmd.flags:
                 header.append(get_name(path))
             if path in files:
-                files[path] = f"{'\n'.join(header)}\n\n{content}"
+                join = "\n".join(header)
+                files[path] = f"{join}\n\n{content}"
 
     if "--split" in cmd.flags:
         split_token: list[str] = []
@@ -97,7 +98,8 @@ def format_output(cmd: Cmd, files: dict[str, str]):
             # split_token.append(eval_cmd(delimiter))
             split_token.append(delimiter)
 
-        return f"\n{'\n'.join(split_token)}\n".join(files)
+        join: str = "\n".join(split_token)
+        return f"\n{join}\n".join(files)
 
     return "\n\n".join(files)
 

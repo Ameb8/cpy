@@ -10,6 +10,7 @@ from treelib import Tree
 from datetime import datetime, date
 from user_vars.use_vars import use_var
 from .get_file_tree import get_file_tree
+from .cmd_parser import Cmd
 
         
 def _missing_arg(command):
@@ -40,7 +41,7 @@ def get_commands(arg):
         "random": lambda: (random.choice(arg.split('|')), None) if arg else _missing_arg("random"),
         "tree": lambda: get_file_tree(arg or '.'),
     }
-
+'''
 def resolve_command(command_text):
     if ':' in command_text: # Command includes arguments
         cmd, arg = map(str.strip, command_text.split(':', 1))
@@ -70,4 +71,8 @@ def resolve_command(command_text):
         return commands[cmd]()
     
     return None, None  # Command not found
+'''
 
+def resolve_command(cmd_text: str):
+    cmd: Cmd = Cmd.get_cmd(cmd_text)
+    
