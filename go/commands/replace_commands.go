@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -9,10 +10,10 @@ func applyVar(input string) (string, error) {
 	result := ""
 
 	command, err := ParseCommand(input)
-	command = command
+	fmt.Printf("%v+", command)
 
 	if err != nil {
-		return "", errors.New("Command could not be parsed")
+		return "", err
 	}
 
 	return result, nil

@@ -75,4 +75,3 @@ def resolve_command(command_text):
 
 def resolve_command(cmd_text: str):
     cmd: Cmd = Cmd.get_cmd(cmd_text)
-    
