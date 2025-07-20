@@ -38,6 +38,7 @@ func replaceBrackets(input string) (string, error) {
 				if err != nil {
 					return "", errors.New("Command could not be parsed")
 				}
+
 				result.WriteString(resolvedVar)
 				i = end + 2
 				continue

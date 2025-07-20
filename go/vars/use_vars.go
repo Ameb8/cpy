@@ -1,0 +1,3 @@
+package vars
+
+func SetVar("")

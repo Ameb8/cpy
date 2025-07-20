@@ -1,13 +1,17 @@
 import (
 	"fmt"
 	"time"
+	"vars"
 )
 
 type CommandHandler func(cmd Command) (string, error)
 
 var CommandTable = map[string]CommandHandler{
 	"now": handleNow
+	"var": handleVar
 }
+
+func handl
 
 func handleNow(cmd Command) (string, error) {
 	format := "rfc3339" // Default format
@@ -64,4 +68,8 @@ func handleNow(cmd Command) (string, error) {
 	}
 
 	return output, nil
+}
+
+func handleVar(Cmd cmd) (string, error) {
+	
 }
