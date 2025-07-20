@@ -45,7 +45,7 @@ func saveData(data map[string]Entry) error {
 	return enc.Encode(data)
 }
 
-func setVar(name, userVar string, params []string) error {
+func setVar(new_var *Entry) error {
 	data, err := loadData()
 
 	if err != nil { // Error loading data
@@ -53,7 +53,7 @@ func setVar(name, userVar string, params []string) error {
 	}
 
 	// Update variables
-	data[name] = Entry{Name: name, UserVar: userVar, Params: params}
+	data[new_var.Name] = *new_var
 	return saveData(data)
 }
 

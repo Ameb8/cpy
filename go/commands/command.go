@@ -57,7 +57,7 @@ func ParseCommand(content string) (*Command, error) {
 	err := getParams(cmd, cmd_parts[1:]) // Parse params
 
 	if err != nil { // Error parsing command
-		return nil, errors.New("Command could not be parse")
+		return nil, errors.New("Command could not be parsed")
 	}
 
 	return cmd, nil

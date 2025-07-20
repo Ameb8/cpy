@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"oos"
+	"os"
+
 	"github.com/ameb8/cpy/vars"
 	"github.com/spf13/cobra"
 )
 
-var printResult(deleted []string, errs []error) {
+func printResult(success []string, errs []error) {
 	for _, deleted := range success { // LPrint successful deletions
-		fmt.Println("'%s' Successfully deleted", deleted)
+		fmt.Printf("'%s' Successfully deleted", deleted)
 	}
 
 	if len(errs) != 0 { // Display errors
@@ -26,23 +27,8 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete variable(s) by providing name",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// Hold deletion results
-		success := make([]string)
-		errs := make([]error)
-
-		for _, arg := range args { // Attempt to delete all args
-			deleted, err = vars.DeleteVar(arg)
-
-			if deleted != "" { // Var deleted
-				success = append(success, deleted)
-			}
-
-			if err != nil { // Deletion error
-				errs = append(errs, err)
-			}
-		}
-
-		printResult(success, errs) // Output results
+		success, errs := vars.DeleteVars(args) // Attempt deletions
+		printResult(success, errs)             // Output results
 	},
 }
 

@@ -1,7 +1,12 @@
 package main
 
-import "github.com/ameb8/cpy/go/cmd"
+import (
+	"fmt"
+
+	"github.com/ameb8/cpy/cmd"
+)
 
 func main() {
+	fmt.Println("Script Called!")
 	cmd.Execute()
 }
