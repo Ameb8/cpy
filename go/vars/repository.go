@@ -57,20 +57,20 @@ func setVar(new_var *Entry) error {
 	return saveData(data)
 }
 
-func getVar(name string) (*Entry, error) {
+func getVar(name string) (string, error) {
 	data, err := loadData()
 
 	if err != nil { // Error loading data
-		return nil, err
+		return "", err
 	}
 
 	entry, ok := data[name] // Search for variable
 
 	if !ok { // Variable not found
-		return nil, fmt.Errorf("entry '%s' not found", name)
+		return "", fmt.Errorf("entry '%s' not found", name)
 	}
 
-	return &entry, nil
+	return entry.String(), nil
 }
 
 func deleteVar(name string) (string, error) {
@@ -95,11 +95,13 @@ func deleteVar(name string) (string, error) {
 	return fmt.Sprintf("Variable '%s' successfully deleted", name), nil
 }
 
-func listVars() (string, error) {
+func listVars() (string, []error) {
+	var errs []error
 	data, err := loadData()
 
 	if err != nil { // Error loading data
-		return "", err
+		errs = append(errs, err)
+		return "", errs
 	}
 
 	if len(data) == 0 { // No variables

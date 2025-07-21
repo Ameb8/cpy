@@ -30,14 +30,14 @@ func validateVar(user_var *Entry) error {
 	name_err := validate(user_var.Name)
 
 	if name_err != '0' {
-		return fmt.Errorf("Invalid character in variable name '%s':\t%r", user_var.Name, name_err)
+		return fmt.Errorf("Invalid character in variable name '%s':\t%q", user_var.Name, name_err)
 	}
 
 	for _, param := range user_var.Params {
 		param_err := validate(param)
 
 		if param_err != '0' {
-			return fmt.Errorf("Invalid character in parameter '%s':\t%r", param, param_err)
+			return fmt.Errorf("Invalid character in parameter '%s':\t%q", param, param_err)
 		}
 	}
 
