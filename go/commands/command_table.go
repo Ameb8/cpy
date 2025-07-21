@@ -1,17 +1,16 @@
+package commands
+
 import (
 	"fmt"
 	"time"
-	"vars"
 )
 
 type CommandHandler func(cmd Command) (string, error)
 
 var CommandTable = map[string]CommandHandler{
-	"now": handleNow
-	"var": handleVar
+	"now": handleNow,
+	//"var": handleVar,
 }
-
-func handl
 
 func handleNow(cmd Command) (string, error) {
 	format := "rfc3339" // Default format
@@ -24,7 +23,7 @@ func handleNow(cmd Command) (string, error) {
 		tz := val[0]
 		loc, err := time.LoadLocation(tz)
 		if err != nil {
-			return nil, fmt.Errorf("invalid timezone: %s", tz)
+			return "", fmt.Errorf("invalid timezone: %s", tz)
 		}
 		location = loc
 	}
@@ -64,12 +63,8 @@ func handleNow(cmd Command) (string, error) {
 	case "stampnano":
 		output = now.Format(time.StampNano)
 	default:
-		return fmt.Errorf("unsupported format: %s", format)
+		return "", fmt.Errorf("unsupported format: %s", format)
 	}
 
 	return output, nil
-}
-
-func handleVar(Cmd cmd) (string, error) {
-	
 }

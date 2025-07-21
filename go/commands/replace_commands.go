@@ -19,7 +19,7 @@ func applyVar(input string) (string, error) {
 	return result, nil
 }
 
-func replaceBrackets(input string) (string, error) {
+func ProcessCommands(input string) (string, error) {
 	var result strings.Builder
 	i := 0
 	for i < len(input) {
