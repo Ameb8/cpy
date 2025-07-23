@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/ameb8/cpy/dev"
+	"github.com/ameb8/cpy/read_files"
 )
 
 func applyVar(input string) (string, error) {
@@ -21,7 +22,14 @@ func applyVar(input string) (string, error) {
 
 	handler, ok := CommandTable[command.Cmd]
 
-	if !ok {
+	if !ok { // Command not in table
+		// Attempt to parse as filepath
+		file_content, file_err := read_files.HandlePath(command.Cmd, command.Flags)
+
+		if file_err == nil {
+			return file_content, file_err
+		}
+
 		return "", fmt.Errorf("unknown command: %s", command.Cmd)
 	}
 
