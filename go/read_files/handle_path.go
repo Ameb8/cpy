@@ -1,20 +1,42 @@
 package read_files
 
 import (
-	"github.com/ameb8/cpy/dev"
+	"strings"
 )
 
-func HandlePath(path string, flags map[string][]string) (string, error) {
-	files, err := loadFiles(path)
+func inMap(collection map[string][]string, key string) bool {
+	_, ok := collection[key] // Check map keys
 
-	dev.Debug("\n\n\nHandlePath() {\n")
-	dev.Debug(files)
+	return ok
+}
 
-	if err != nil {
-		dev.Debugf("Error getting files:\t%s\n", err)
+func getLabels(flags map[string][]string) (bool, bool) {
+	// Add label to content
+	path := inMap(flags, "--path")
+	name := inMap(flags, "--name")
+
+	return path, name
+}
+
+func getDelimiter(flags map[string][]string) string {
+	delimiter, ok := flags["--split"]
+
+	if !ok { // default delimiter
+		return "\n\n"
 	}
 
-	dev.Debug("}\n\n\n")
+	return strings.Join(delimiter, " ")
+}
+func HandlePath(path string, flags map[string][]string) (string, error) {
+	files, err := loadFiles(path) // Load files
 
-	return "Filepath Evaluated", err
+	// Add labels
+	pathLbl, nameLbl := getLabels(flags)
+	appendLabels(files, pathLbl, nameLbl)
+
+	// Join file content
+	delimiter := getDelimiter(flags)
+	result := formatFiles(files, delimiter)
+
+	return result, err
 }

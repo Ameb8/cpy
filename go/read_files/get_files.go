@@ -9,8 +9,34 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 )
 
-func loadFiles(pattern string) (map[string]string, error) {
-	matches, err := doublestar.Glob(os.DirFS("."), pattern)
+func getAbsPath(relativePath string) (string, error) {
+	cwd, err := os.Getwd() // Get cwd
+
+	if err != nil { // Error getting cwd
+		return "", err
+	}
+
+	// Join and clean filepath
+	absPath := filepath.Join(cwd, relativePath)
+	absPath = filepath.Clean(absPath)
+
+	// Make path relative to root
+	relToRoot, err := filepath.Rel("/", absPath)
+	if err != nil {
+		return "", err
+	}
+
+	return relToRoot, nil
+}
+
+func loadFiles(relativePath string) (map[string]string, error) {
+	absPath, err := getAbsPath(relativePath) // Convert relative path to absolute
+
+	if err != nil { // Error getting absolute path
+		return nil, err
+	}
+
+	matches, err := doublestar.Glob(os.DirFS("/"), absPath)
 
 	if err != nil { // Error evaluating filepath
 		return nil, err
@@ -23,7 +49,7 @@ func loadFiles(pattern string) (map[string]string, error) {
 	result := make(map[string]string)
 
 	for _, match := range matches {
-		content, err := readTextFile(match)
+		content, err := readTextFile("/" + match)
 
 		if err != nil { // skip unreadable or binary files
 			continue
