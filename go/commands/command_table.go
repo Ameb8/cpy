@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ameb8/cpy/dev"
+	"github.com/ameb8/cpy/read_files"
 	"github.com/ameb8/cpy/vars"
 )
 
@@ -89,7 +90,18 @@ func handleVar(cmd Command) (string, error) {
 	return swap, nil
 }
 
+func handleTree(cmd Command) (string, error) {
+	path := "."
+
+	if len(cmd.Args) != 0 {
+		path = cmd.Args[0]
+	}
+
+	return read_files.GetTree(path)
+}
+
 func init() { // Initialize Command handler functions
 	CommandTable["now"] = handleNow
 	CommandTable["var"] = handleVar
+	CommandTable["tree"] = handleTree
 }
