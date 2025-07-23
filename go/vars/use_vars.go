@@ -74,7 +74,7 @@ func GetVars(var_names []string) (string, []error) {
 		return "", errs
 	}
 
-	var vars []string
+	var vars strings.Builder
 
 	for _, name := range valid_names { // Get named items from data
 		fetched, err := getVar(name) // Attempt fetch
@@ -83,10 +83,36 @@ func GetVars(var_names []string) (string, []error) {
 			errs = append(errs, err)
 		}
 
-		if fetched != "" { // Record Variable
-			vars = append(vars, fetched)
+		if fetched != nil { // Record Variable
+			vars.WriteString(fetched.String())
+			vars.WriteByte('\n')
 		}
 	}
 
-	return strings.Join(vars, "\n"), errs
+	return vars.String(), errs
+}
+
+func UseVar(name string, args []string) (string, error) {
+	dev.Debug("\n\n\nvars.UseVar() { \n")
+	dev.Debugf("name:\t%s\n", name)
+	dev.Debugf("args:\t%q\n", args)
+
+	user_var, err := getVar(name)
+
+	dev.Debugf("Fetched From repo:\n%s\n", user_var.String())
+
+	if err != nil { // Error loading variable
+		return "", err
+	}
+
+	output, arg_err := applyParams(user_var, args)
+
+	dev.Debugf("Params applied: %s\n}\n\n\n", output)
+
+	if arg_err != nil {
+		return "", arg_err
+	}
+
+	return output, nil
+
 }

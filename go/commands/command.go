@@ -2,6 +2,8 @@ package commands
 
 import (
 	"errors"
+	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -35,7 +37,6 @@ func getParams(cmd *Command, cmd_parts []string) error {
 				cmd.Flags[lastFlag] = append(cmd.Flags[lastFlag], part)
 			}
 		}
-
 	}
 
 	return nil
@@ -61,4 +62,46 @@ func ParseCommand(content string) (*Command, error) {
 	}
 
 	return cmd, nil
+}
+
+func (c Command) String() string {
+	var b strings.Builder
+
+	b.WriteString("Command Debug Info:\n")
+
+	// Write the command name
+	b.WriteString(fmt.Sprintf("  Cmd: %q\n", c.Cmd))
+
+	// Write arguments
+	if len(c.Args) > 0 {
+		b.WriteString("  Args:\n")
+		for i, arg := range c.Args {
+			b.WriteString(fmt.Sprintf("    [%d]: %q\n", i, arg))
+		}
+	} else {
+		b.WriteString("  Args: (none)\n")
+	}
+
+	// Write flags
+	if len(c.Flags) > 0 {
+		b.WriteString("  Flags:\n")
+
+		keys := make([]string, 0, len(c.Flags))
+		for k := range c.Flags {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+
+		for _, k := range keys {
+			b.WriteString(fmt.Sprintf("    %q:\n", k))
+			vals := c.Flags[k]
+			for i, v := range vals {
+				b.WriteString(fmt.Sprintf("      [%d]: %q\n", i, v))
+			}
+		}
+	} else {
+		b.WriteString("  Flags: (none)\n")
+	}
+
+	return b.String()
 }

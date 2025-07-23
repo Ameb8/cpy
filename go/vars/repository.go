@@ -57,20 +57,20 @@ func setVar(new_var *Entry) error {
 	return saveData(data)
 }
 
-func getVar(name string) (string, error) {
+func getVar(name string) (*Entry, error) {
 	data, err := loadData()
 
 	if err != nil { // Error loading data
-		return "", err
+		return nil, err
 	}
 
 	entry, ok := data[name] // Search for variable
 
 	if !ok { // Variable not found
-		return "", fmt.Errorf("entry '%s' not found", name)
+		return nil, fmt.Errorf("entry '%s' not found", name)
 	}
 
-	return entry.String(), nil
+	return &entry, nil
 }
 
 func deleteVar(name string) (string, error) {

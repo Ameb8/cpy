@@ -4,15 +4,30 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/ameb8/cpy/dev"
 )
 
 func applyVar(input string) (string, error) {
 	result := ""
 
 	command, err := ParseCommand(input)
-	fmt.Printf("%v+", command)
+
+	dev.Debugf("Command:\n%s\n", command.String())
 
 	if err != nil {
+		return "", err
+	}
+
+	handler, ok := CommandTable[command.Cmd]
+
+	if !ok {
+		return "", fmt.Errorf("unknown command: %s", command.Cmd)
+	}
+
+	result, cmd_err := handler(*command)
+
+	if cmd_err != nil {
 		return "", err
 	}
 
@@ -33,6 +48,9 @@ func ProcessCommands(input string) (string, error) {
 			}
 			if end+1 < len(input) && input[end] == ']' && input[end+1] == ']' {
 				content := input[i+2 : end]
+
+				dev.Debugf("\n\n\nReplacing Command: %s\n", content)
+
 				resolvedVar, err := applyVar(content)
 
 				if err != nil {

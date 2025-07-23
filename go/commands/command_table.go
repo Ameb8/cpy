@@ -3,14 +3,14 @@ package commands
 import (
 	"fmt"
 	"time"
+
+	"github.com/ameb8/cpy/dev"
+	"github.com/ameb8/cpy/vars"
 )
 
 type CommandHandler func(cmd Command) (string, error)
 
-var CommandTable = map[string]CommandHandler{
-	"now": handleNow,
-	//"var": handleVar,
-}
+var CommandTable = map[string]CommandHandler{}
 
 func handleNow(cmd Command) (string, error) {
 	format := "rfc3339" // Default format
@@ -22,9 +22,11 @@ func handleNow(cmd Command) (string, error) {
 	if val, ok := cmd.Flags["timezone"]; ok && len(val) > 0 {
 		tz := val[0]
 		loc, err := time.LoadLocation(tz)
+
 		if err != nil {
 			return "", fmt.Errorf("invalid timezone: %s", tz)
 		}
+
 		location = loc
 	}
 
@@ -67,4 +69,27 @@ func handleNow(cmd Command) (string, error) {
 	}
 
 	return output, nil
+}
+
+func handleVar(cmd Command) (string, error) {
+	user_var, err := vars.UseVar(cmd.Args[0], cmd.Args[1:]) // Replace command with var
+
+	dev.Debugf("\ncommands.handleVar():\n%s\n", user_var)
+
+	if err != nil { // Error applying var
+		return "", err
+	}
+
+	swap, rec_err := ProcessCommands(user_var) // Recursively process var content
+
+	if rec_err != nil { // Error processing
+		return "", rec_err
+	}
+
+	return swap, nil
+}
+
+func init() { // Initialize Command handler functions
+	CommandTable["now"] = handleNow
+	CommandTable["var"] = handleVar
 }

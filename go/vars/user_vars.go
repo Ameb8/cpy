@@ -2,8 +2,11 @@ package vars
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"unicode"
+
+	"github.com/ameb8/cpy/dev"
 )
 
 type Entry struct {
@@ -42,4 +45,28 @@ func validateVar(user_var *Entry) error {
 	}
 
 	return nil
+}
+
+func applyParams(user_var *Entry, args []string) (string, error) {
+	dev.Debugf("\n\n\napplyParams() { \n")
+
+	re := regexp.MustCompile(`<<.*?>>`)
+
+	// Find all parameters
+	params := re.FindAllString(user_var.UserVar, -1)
+	if len(params) != len(args) {
+		dev.Debugf("Error: params found = %d, args passed = %d\n\n\n", len(params), len(args))
+
+		return "", fmt.Errorf("mismatch: found %d params but got %d args", len(params), len(args))
+	}
+
+	// Apply arguments
+	i := 0
+	result := re.ReplaceAllStringFunc(user_var.UserVar, func(_ string) string {
+		repl := args[i]
+		i++
+		return repl
+	})
+
+	return result, nil
 }
