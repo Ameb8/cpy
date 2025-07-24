@@ -7,6 +7,7 @@ import (
 
 	"github.com/ameb8/cpy/copy"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -33,7 +34,15 @@ func Execute() {
 	}
 }
 
+func configInit() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	viper.ReadInConfig()
+}
+
 func init() {
+	cobra.OnInitialize(configInit)
 	rootCmd.Flags().BoolVar(&appendFlag, "append", false, "Append instead of replacing clipboard")
 	rootCmd.Flags().BoolVar(&outFlag, "out", false, "Print clipboard content")
 }

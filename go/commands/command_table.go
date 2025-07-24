@@ -97,7 +97,7 @@ func handleTree(cmd Command) (string, error) {
 		path = cmd.Args[0]
 	}
 
-	return read_files.GetTree(path)
+	return read_files.GetTree(path, cmd.Flags)
 }
 
 func init() { // Initialize Command handler functions

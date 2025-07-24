@@ -6,22 +6,27 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 
+	"github.com/ameb8/cpy/dev"
+	"github.com/spf13/viper"
 	"github.com/xlab/treeprint"
 )
 
 type include struct {
-	include  map[string]struct{}
-	exclude  map[string]struct{}
-	maxDepth int
-	emptyDir bool
+	includeExts      map[string]struct{}
+	excludeDirs      map[string]struct{}
+	excludeFileGlobs []string
+	maxDepth         int
 }
 
 func getMap(slice []string) map[string]struct{} {
 	set := make(map[string]struct{}, len(slice)) // preallocate map with capacity
+
 	for _, s := range slice {
-		set[s] = struct{}{} // empty struct{} takes zero bytes
+		set[s] = struct{}{}
 	}
+
 	return set
 }
 
@@ -30,7 +35,7 @@ func parseDepth(flags map[string][]string) int {
 	if depthVals, ok := flags["--depth"]; ok && len(depthVals) > 0 {
 		val, err := strconv.Atoi(depthVals[0])
 
-		// Valid positive integer
+		// Valid positive integer param
 		if err == nil && val > 0 {
 			return val
 		}
@@ -39,16 +44,90 @@ func parseDepth(flags map[string][]string) int {
 	return 0
 }
 
+/*
+func getExcluded(flags map[string][]string) map[string]struct{} {
+	exclude := make(map[string]struct{})
+
+	// Add excludes from config settings
+	for _, exc := range viper.GetStringSlice("tree_exclude") {
+		exclude[exc] = struct{}{}
+	}
+
+	// Add exclude arguments
+	for _, exc := range flags["--exclude"] {
+		exclude[exc] = struct{}{}
+	}
+
+	return exclude
+
+}
+*/
+
 func getInclude(flags map[string][]string) *include {
+	// DEBUG *****
+	dev.Debug("\n\n\n\nEXCLUDE:\n\n")
+	dev.Debug(viper.GetStringSlice("exclude_dirs"))
+
 	return &include{
-		include:  getMap(flags["--include"]),
-		exclude:  getMap(flags["--exclude"]),
-		maxDepth: parseDepth(flags),
+		includeExts:      getMap(flags["--include"]),
+		excludeDirs:      getMap(viper.GetStringSlice("exclude_dirs")),
+		excludeFileGlobs: viper.GetStringSlice("exclude_files"),
+		maxDepth:         parseDepth(flags),
 	}
 }
 
+func (inc *include) excludeFile(path string, depth int) bool {
+	if depth >= inc.maxDepth {
+		return false // Depth too great, exclude file
+	}
+
+	base := filepath.Base(path)
+
+	for _, pattern := range inc.excludeFileGlobs {
+		match, _ := filepath.Match(pattern, base)
+
+		if match {
+			return true
+		}
+	}
+
+	if len(inc.includeExts) == 0 {
+		return false
+	}
+
+	_, include := inc.includeExts[filepath.Ext(path)]
+
+	return !include
+}
+
+func (inc *include) excludeDir(path string, depth int) bool {
+	if depth >= inc.maxDepth {
+		return false // Too deep, exclude
+	}
+
+	for dir, _ := range inc.excludeDirs {
+		if strings.Contains(path, dir) {
+			return true
+		}
+	}
+
+	return false
+}
+
+/*
 func (inc *include) includeFile(path string, depth int) bool {
+	if inc.maxDepth > 0 && depth > inc.maxDepth {
+		return false // Too deep
+	}
+
+	//Segment filepath
 	ext := filepath.Ext(path)
+	base := filepath.Base(path)
+
+	// excluded base path
+	if _, ok := inc.exclude[base]; ok {
+		return false
+	}
 
 	if ext != "" {
 		_, ok := inc.include[ext]
@@ -67,6 +146,7 @@ func (inc *include) includeFile(path string, depth int) bool {
 
 	return inc.maxDepth <= depth
 }
+*/
 
 func GetTree(inputPath string, flags map[string][]string) (string, error) {
 	// Convert input to absolute path
@@ -87,7 +167,7 @@ func GetTree(inputPath string, flags map[string][]string) (string, error) {
 	// Create tree
 	tree := treeprint.New()
 	tree.SetValue(info.Name())
-	err = walkDir(rootPath, tree)
+	err = walkDir(rootPath, tree, include, 1)
 
 	if err != nil { // Error creating tree
 		return "", err
@@ -96,7 +176,7 @@ func GetTree(inputPath string, flags map[string][]string) (string, error) {
 	return tree.String(), nil
 }
 
-func walkDir(path string, node treeprint.Tree) error {
+func walkDir(path string, node treeprint.Tree, inc *include, depth int) error {
 	entries, err := os.ReadDir(path) // Read directory contents
 
 	if err != nil { // Read error
@@ -108,18 +188,28 @@ func walkDir(path string, node treeprint.Tree) error {
 	})
 
 	for _, entry := range entries { // Iterate entries
-		entryPath := filepath.Join(path, entry.Name())
+		entryName := entry.Name()
+		entryPath := filepath.Join(path, entryName)
 
 		if entry.IsDir() { // Entry is directory
-			branch := node.AddBranch(entry.Name()) // Add branch
-
-			// Add branch to tree
-			if err := walkDir(entryPath, branch); err != nil {
-				return err // Error adding branch
+			if inc.excludeDir(entryName, depth) {
+				continue
 			}
 
-		} else { // Add file to tree
-			node.AddNode(entry.Name())
+			//if _, skip := inc.excludeDirs[entryName]; skip {
+			//	continue // Exclude directory
+			//}
+
+			// Add branch for directory
+			branch := node.AddBranch(entryName)
+			err := walkDir(entryPath, branch, inc, depth+1)
+
+			if err != nil { // Error adding branch
+				return err
+			}
+
+		} else if !inc.excludeFile(entryPath, depth) {
+			node.AddNode(entryName) // Add file
 		}
 	}
 
