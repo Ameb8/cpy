@@ -1,0 +1,37 @@
+exclude_dirs:
+  - .DS_Store              # macOS metadata
+  - node_modules           # npm packages
+  - __pycache__            # Python bytecode
+  - .coverage              # Coverage reports
+  - .env                   # Environment variable files
+  - .git                   # Git metadata
+  - .venv                  # Python virtual environments
+  - venv                   # Alt name for virtualenvs
+  - .idea                  # JetBrains IDE project settings
+  - .vscode                # VSCode settings
+  - *.pyc                  # Compiled Python files
+  - *.log                  # Log files
+  - *.egg-info             # Python package metadata
+  - *.lock                 # lock files like package-lock.json
+  - *.tmp                  # Temporary files
+  - *.swp                  # Vim swap files
+  - Thumbs.db              # Windows image cache
+  - .Trash*                # Mac trash folder
+
+exclude_files:
+  - .env
+  - .log
+  - .pyc
+  - .venv
+  - .lock
+  - .tmp
+  - .swp
+  - .class
+  - .idea
+  - .DS_Store
+
+glob_path_exclude:
+  - .DS_Store
+  - node_modules
+  - __pycache__
+  - .git

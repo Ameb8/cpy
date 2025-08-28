@@ -2,6 +2,10 @@ from pathlib import Path
 from treelib import Tree
 import glob
 from .command import resolve_command
+from .cmd_parser import Cmd
+
+
+
 
 INVALID_PATH_ERR = "Command not recognized:"
 
@@ -61,7 +65,8 @@ def read_files(path_pattern, encoding = "utf-8", max_files = 1000):
                         print(f"Warning: Reached max file limit ({max_files}).")
                         break
                 except (UnicodeDecodeError, PermissionError, OSError) as e:
-                    errors[str(path)] = e
+                    # errors[str(path)] = e
+                    continue
 
         if not file_map and not errors:
             print("Warning: No files matched or could be read.")
@@ -70,32 +75,46 @@ def read_files(path_pattern, encoding = "utf-8", max_files = 1000):
 
     except Exception as e:
         return {}, [(path_pattern, e)]
-    
-def format_output(files, delimiter_arg):
-    delimiter = "\n\n" # Default separator
 
-    if delimiter_arg: # Separator specified
-        if delimiter_arg.strip() == 'path': # Prepend path before files
-            return delimiter.join(f"{path}:\n\n{content}" for path, content in files.items()), None
-        if delimiter_arg.strip() == 'name': # Prepend filename before files
-            return delimiter.join(f"{path.rsplit('/', 1)[-1]}:\n\n{content}" for path, content in files.items()), None
+def get_name(path: str) -> str:
+    components = path.strip().split("/")
+    return components[-1]
 
-        delimiter, error = resolve_command(delimiter_arg)
-        
-        if error: # Invalid separator
-            return None, error
+def format_output(cmd: Cmd, files: dict[str, str]):
+    if "path" in cmd.flags or "name" in cmd.flags:
+        for path, content in files:
+            header: list[str] = []
+            if "path" in cmd.flags:
+                header.append(path)
+            if "name" in cmd.flags:
+                header.append(get_name(path))
+            if path in files:
+                join = "\n".join(header)
+                files[path] = f"{join}\n\n{content}"
 
-    return f"{delimiter}\n\n".join(files.values()), None
-    
-def evaluate_path(input):
+    if "--split" in cmd.flags:
+        split_token: list[str] = []
+        for delimiter in cmd.flags["--split"]:
+            # split_token.append(eval_cmd(delimiter))
+            split_token.append(delimiter)
+
+        join: str = "\n".join(split_token)
+        return f"\n{join}\n".join(files)
+
+    return "\n\n".join(files)
+
+
+def evaluate_path(input: str):
+    cmd: Cmd = Cmd.get_cmd(input)
+
     # Parse filepath and separator
-    path, split = get_delimiter(input)
+    #path, split = get_delimiter(input)
 
-    if not path: # Invalid path
+    if not cmd or not cmd.cmd: # Invalid path
         return None, INVALID_PATH_ERR
     
     # Read files into memory
-    files, errors = read_files(path)
+    files, errors = read_files(cmd.cmd)
 
     if errors: # Error while reading
         err_str = f"File read error(s): {[f'{k}: {str(v)}' for k,v in errors]}"
@@ -104,5 +123,5 @@ def evaluate_path(input):
     if not files: # Invalid filepath
         return None, INVALID_PATH_ERR
 
-    return format_output(files, split)
+    return format_output(cmd, files)
 
